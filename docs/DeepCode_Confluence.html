@@ -1,0 +1,960 @@
+<body>
+
+<!-- 목차 -->
+<ac:structured-macro ac:name="toc">
+  <ac:parameter ac:name="printable">true</ac:parameter>
+  <ac:parameter ac:name="style">disc</ac:parameter>
+  <ac:parameter ac:name="maxLevel">3</ac:parameter>
+  <ac:parameter ac:name="minLevel">1</ac:parameter>
+</ac:structured-macro>
+
+<hr />
+
+<h1>DeepCode 개요</h1>
+
+<ac:structured-macro ac:name="info">
+  <ac:rich-text-body>
+    <p><strong>DeepCode</strong>는 HKU Data Intelligence Lab에서 개발한 <strong>Multi-Agent 기반 코드 자동 생성 시스템</strong>임. 연구 논문(PDF)이나 자연어 요구사항을 분석하여 실제 작동하는 production-ready 코드를 자동 생성함.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>주요 특징</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>특징</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Blue</ac:parameter><ac:parameter ac:name="title">Multi-Agent</ac:parameter></ac:structured-macro></td>
+      <td>전문화된 Agent들의 협업을 통한 고품질 코드 생성</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Green</ac:parameter><ac:parameter ac:name="title">MCP 기반</ac:parameter></ac:structured-macro></td>
+      <td>Model Context Protocol을 통한 모듈화된 도구 시스템</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Yellow</ac:parameter><ac:parameter ac:name="title">다중 입력</ac:parameter></ac:structured-macro></td>
+      <td>PDF, URL, 텍스트, PPTX, DOCX 등 다양한 입력 지원</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Purple</ac:parameter><ac:parameter ac:name="title">다중 인터페이스</ac:parameter></ac:structured-macro></td>
+      <td>CLI 및 Web UI (Streamlit) 동시 지원</td>
+    </tr>
+    <tr>
+      <td><ac:structured-macro ac:name="status"><ac:parameter ac:name="colour">Red</ac:parameter><ac:parameter ac:name="title">CodeRAG</ac:parameter></ac:structured-macro></td>
+      <td>Knowledge Graph 기반 코드 인덱싱 및 참조 시스템</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>PaperBench 성능 (SOTA)</h2>
+
+<ac:structured-macro ac:name="panel">
+  <ac:parameter ac:name="title">OpenAI PaperBench Code-Dev 벤치마크 결과</ac:parameter>
+  <ac:parameter ac:name="borderStyle">solid</ac:parameter>
+  <ac:rich-text-body>
+    <ul>
+      <li><strong>Human Expert 대비</strong>: DeepCode 75.9% vs Top ML PhD 72.4% (+3.5%)</li>
+      <li><strong>Commercial Agent 대비</strong>: DeepCode 84.8% vs Claude Code/Cursor 58.7% (+26.1%)</li>
+      <li><strong>Scientific Agent 대비</strong>: DeepCode 73.5% vs PaperCoder 51.1% (+22.4%)</li>
+      <li><strong>LLM Agent 대비</strong>: DeepCode 73.5% vs o1 BasicAgent 43.3% (+30.2%)</li>
+    </ul>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr />
+
+<h1>핵심 기능</h1>
+
+<h2>Paper2Code</h2>
+<ac:structured-macro ac:name="note">
+  <ac:rich-text-body>
+    <p>연구 논문(PDF)에서 알고리즘을 추출하여 production-ready 코드로 자동 변환. 학술 논문 재현 작업 자동화.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>Text2Web</h2>
+<ac:structured-macro ac:name="note">
+  <ac:rich-text-body>
+    <p>자연어 설명을 기반으로 fully functional frontend 웹 코드 생성. React, Vue 등 다양한 프레임워크 지원.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>Text2Backend</h2>
+<ac:structured-macro ac:name="note">
+  <ac:rich-text-body>
+    <p>텍스트 요구사항으로부터 scalable backend 코드 생성. FastAPI, Flask, Express 등 지원.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr />
+
+<h1>시스템 아키텍처</h1>
+
+<h2>전체 구조</h2>
+
+<ac:structured-macro ac:name="code">
+  <ac:parameter ac:name="language">text</ac:parameter>
+  <ac:parameter ac:name="title">DeepCode System Architecture</ac:parameter>
+  <ac:plain-text-body><![CDATA[┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              DeepCode System                                     │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│   ┌─────────────┐    ┌─────────────┐                                           │
+│   │  CLI        │    │  Web UI     │     ← User Interfaces                     │
+│   │ main_cli.py │    │ Streamlit   │                                           │
+│   └──────┬──────┘    └──────┬──────┘                                           │
+│          │                  │                                                   │
+│          └────────┬─────────┘                                                   │
+│                   ↓                                                             │
+│   ┌───────────────────────────────────────┐                                    │
+│   │      Agent Orchestration Engine       │  ← Master Coordinator              │
+│   │  agent_orchestration_engine.py        │                                    │
+│   └───────────────────┬───────────────────┘                                    │
+│                       ↓                                                         │
+│   ┌─────────────────────────────────────────────────────────────────┐          │
+│   │                    Specialized Agents                           │          │
+│   │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐            │          │
+│   │  │ Requirement  │ │   Document   │ │    Code      │            │          │
+│   │  │   Analysis   │ │ Segmentation │ │Implementation│            │          │
+│   │  └──────────────┘ └──────────────┘ └──────────────┘            │          │
+│   └─────────────────────────┬───────────────────────────────────────┘          │
+│                             ↓                                                   │
+│   ┌─────────────────────────────────────────────────────────────────┐          │
+│   │                      MCP Tool Servers                           │          │
+│   │  filesystem │ code-impl │ doc-segment │ code-indexer │ search  │          │
+│   └─────────────────────────────────────────────────────────────────┘          │
+│                             ↓                                                   │
+│   ┌─────────────────────────────────────────────────────────────────┐          │
+│   │                     LLM Providers                               │          │
+│   │        Anthropic  │  Google Gemini  │  OpenAI/vLLM             │          │
+│   └─────────────────────────────────────────────────────────────────┘          │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h2>디렉토리 구조</h2>
+
+<ac:structured-macro ac:name="expand">
+  <ac:parameter ac:name="title">프로젝트 디렉토리 구조 (클릭하여 펼침)</ac:parameter>
+  <ac:rich-text-body>
+    <ac:structured-macro ac:name="code">
+      <ac:parameter ac:name="language">text</ac:parameter>
+      <ac:plain-text-body><![CDATA[DeepCode/
+├── cli/                           # CLI 인터페이스
+│   ├── main_cli.py               # CLI 진입점
+│   ├── cli_app.py                # CLI 애플리케이션 로직
+│   ├── cli_interface.py          # 터미널 UI (메뉴, 색상)
+│   └── workflows/                # CLI-워크플로우 연결
+│       └── cli_workflow_adapter.py
+│
+├── ui/                            # Web UI (Streamlit)
+│   ├── layout.py                 # 페이지 레이아웃
+│   ├── components.py             # UI 컴포넌트
+│   ├── handlers.py               # 이벤트 핸들러
+│   └── styles.py                 # CSS 스타일링
+│
+├── workflows/                     # 워크플로우 엔진
+│   ├── agent_orchestration_engine.py  # 핵심: 에이전트 오케스트레이션
+│   ├── code_implementation_workflow.py
+│   ├── code_implementation_workflow_index.py
+│   ├── codebase_index_workflow.py
+│   └── agents/                   # 전문화된 에이전트들
+│       ├── requirement_analysis_agent.py
+│       ├── document_segmentation_agent.py
+│       └── code_implementation_agent.py
+│
+├── tools/                         # MCP 도구 서버들
+│   ├── code_implementation_server.py  # 파일 생성/실행
+│   ├── code_reference_indexer.py     # 코드 검색
+│   ├── code_indexer.py               # 인덱스 생성
+│   ├── document_segmentation_server.py
+│   └── run_reference_indexer.py  # 독립 인덱싱 스크립트
+│
+├── prompts/                       # 프롬프트 템플릿
+│   └── code_prompts.py           # ~1,800줄의 프롬프트 정의
+│
+├── deepcode_lab/                  # 작업 디렉토리
+│   ├── papers/                   # 처리된 논문 결과
+│   ├── reference_code/           # 참조 코드베이스
+│   └── indexes/                  # 코드 인덱스
+│
+├── mcp_agent.config.yaml          # MCP 및 LLM 설정
+├── mcp_agent.secrets.yaml         # API 키
+└── deepcode.py                    # Web UI 진입점]]></ac:plain-text-body>
+    </ac:structured-macro>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr />
+
+<h1>Multi-Agent 구조</h1>
+
+<h2>Agent 역할 정의</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Agent</th>
+      <th>역할</th>
+      <th>파일 위치</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Central Orchestrating Agent</strong></td>
+      <td>전체 워크플로우 조율 및 전략 결정. 입력 복잡도 분석 기반 Agent 조합 결정</td>
+      <td><code>agent_orchestration_engine.py</code></td>
+    </tr>
+    <tr>
+      <td><strong>Intent Understanding Agent</strong></td>
+      <td>사용자 요구사항의 deep semantic 분석. 기능 스펙 및 기술 제약 추출</td>
+      <td><code>agent_orchestration_engine.py</code></td>
+    </tr>
+    <tr>
+      <td><strong>Document Parsing Agent</strong></td>
+      <td>기술 문서 및 연구 논문 파싱. 알고리즘/방법론 추출</td>
+      <td><code>agents/document_segmentation_agent.py</code></td>
+    </tr>
+    <tr>
+      <td><strong>Code Planning Agent</strong></td>
+      <td>아키텍처 설계 및 기술 스택 최적화. YAML 형식의 구현 계획 생성</td>
+      <td><code>agent_orchestration_engine.py</code></td>
+    </tr>
+    <tr>
+      <td><strong>Code Reference Mining Agent</strong></td>
+      <td>관련 GitHub Repository 탐색. 호환성 및 통합 가능성 분석</td>
+      <td><code>agent_orchestration_engine.py</code></td>
+    </tr>
+    <tr>
+      <td><strong>Code Indexing Agent</strong></td>
+      <td>발견된 코드베이스의 Knowledge Graph 구축. 시맨틱 관계 매핑</td>
+      <td><code>tools/code_indexer.py</code></td>
+    </tr>
+    <tr>
+      <td><strong>Code Generation Agent</strong></td>
+      <td>수집 정보 기반 실행 가능한 코드 생성. 테스트 및 문서 포함</td>
+      <td><code>agents/code_implementation_agent.py</code></td>
+    </tr>
+    <tr>
+      <td><strong>Requirement Analysis Agent</strong></td>
+      <td>요구사항 분석 및 가이드 질문 생성. 인터랙티브 요구사항 수집</td>
+      <td><code>agents/requirement_analysis_agent.py</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Agent 협업 흐름</h2>
+
+<ac:structured-macro ac:name="code">
+  <ac:parameter ac:name="language">text</ac:parameter>
+  <ac:parameter ac:name="title">Agent Pipeline Flow</ac:parameter>
+  <ac:plain-text-body><![CDATA[┌──────────────────────────────────────────────────────────────────────────┐
+│  INPUT LAYER                                                              │
+│  📄 Research Papers • 💬 Natural Language • 🌐 URLs • 📋 Requirements    │
+└────────────────────────────────────┬─────────────────────────────────────┘
+                                     ↓
+┌──────────────────────────────────────────────────────────────────────────┐
+│  CENTRAL ORCHESTRATION                                                    │
+│  Strategic Decision Making • Workflow Coordination • Agent Management    │
+└────────────────────────────────────┬─────────────────────────────────────┘
+                                     ↓
+         ┌───────────────────────────┴───────────────────────────┐
+         ↓                                                       ↓
+┌─────────────────────┐                             ┌─────────────────────┐
+│  TEXT ANALYSIS      │                             │  DOCUMENT ANALYSIS  │
+│  Requirement        │                             │  Paper & Spec       │
+│  Processing         │                             │  Processing         │
+└─────────┬───────────┘                             └───────────┬─────────┘
+          └───────────────────────┬─────────────────────────────┘
+                                  ↓
+┌──────────────────────────────────────────────────────────────────────────┐
+│  REPRODUCTION PLANNING                                                    │
+│  Deep Paper Analysis • Code Requirements Parsing • Strategy Development  │
+└────────────────────────────────────┬─────────────────────────────────────┘
+                                     ↓
+         ┌───────────────────────────┴───────────────────────────┐
+         ↓                                                       ↓
+┌─────────────────────┐                             ┌─────────────────────┐
+│  REFERENCE ANALYSIS │                             │  CODE INDEXING      │
+│  Repository         │                             │  Knowledge Graph    │
+│  Discovery          │                             │  Building           │
+└─────────┬───────────┘                             └───────────┬─────────┘
+          └───────────────────────┬─────────────────────────────┘
+                                  ↓
+┌──────────────────────────────────────────────────────────────────────────┐
+│  CODE IMPLEMENTATION                                                      │
+│  Implementation Generation • Testing • Documentation                     │
+└────────────────────────────────────┬─────────────────────────────────────┘
+                                     ↓
+┌──────────────────────────────────────────────────────────────────────────┐
+│  OUTPUT DELIVERY                                                          │
+│  📦 Complete Codebase • 🧪 Test Suite • 📚 Documentation • 🚀 Deploy    │
+└──────────────────────────────────────────────────────────────────────────┘]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<hr />
+
+<h1>MCP Tool Servers</h1>
+
+<ac:structured-macro ac:name="tip">
+  <ac:rich-text-body>
+    <p><strong>MCP (Model Context Protocol)</strong>: AI Agent와 외부 시스템 간 통신을 위한 표준 프로토콜. DeepCode는 MCP를 통해 다양한 도구를 모듈화하여 통합함.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>도구 서버 목록</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>MCP Server</th>
+      <th>기능</th>
+      <th>주요 Tool</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>filesystem</strong></td>
+      <td>파일 시스템 접근</td>
+      <td>read_file, list_directory</td>
+    </tr>
+    <tr>
+      <td><strong>code-implementation</strong></td>
+      <td>파일 생성 및 코드 실행</td>
+      <td>write_file, execute_python, execute_bash</td>
+    </tr>
+    <tr>
+      <td><strong>document-segmentation</strong></td>
+      <td>대용량 문서 지능형 분할</td>
+      <td>analyze_document, get_segment</td>
+    </tr>
+    <tr>
+      <td><strong>code-reference-indexer</strong></td>
+      <td>코드 인덱스 검색</td>
+      <td>search_code_references, get_indexes_overview</td>
+    </tr>
+    <tr>
+      <td><strong>file-downloader</strong></td>
+      <td>PDF/문서 다운로드 및 변환</td>
+      <td>download_file</td>
+    </tr>
+    <tr>
+      <td><strong>github-downloader</strong></td>
+      <td>Git Repository 클론</td>
+      <td>clone_repository</td>
+    </tr>
+    <tr>
+      <td><strong>brave / bocha-mcp</strong></td>
+      <td>웹 검색</td>
+      <td>brave_search, web_search</td>
+    </tr>
+    <tr>
+      <td><strong>command-executor</strong></td>
+      <td>시스템 명령어 실행</td>
+      <td>execute_command</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h1>실행 파이프라인</h1>
+
+<h2>Pipeline A: 연구 논문 → 코드 생성</h2>
+
+<ac:structured-macro ac:name="expand">
+  <ac:parameter ac:name="title">execute_multi_agent_research_pipeline() 상세 (클릭하여 펼침)</ac:parameter>
+  <ac:rich-text-body>
+    <ac:structured-macro ac:name="code">
+      <ac:parameter ac:name="language">text</ac:parameter>
+      <ac:plain-text-body><![CDATA[Phase 0: Workspace Setup
+└─ deepcode_lab/papers/{id}/ 디렉토리 생성
+
+Phase 1: Research Analysis
+├─ run_research_analyzer()
+│   → PAPER_INPUT_ANALYZER_PROMPT
+│   → JSON: {input_type, path, paper_info}
+└─ run_resource_processor()
+    → 파일 복사 또는 URL 다운로드
+
+Phase 2: Workspace Synthesis
+└─ synthesize_workspace_infrastructure_agent()
+    → 파일 구조 메타데이터 생성
+
+Phase 3.5: Document Preprocessing (옵션)
+└─ orchestrate_document_preprocessing_agent()
+    → 대용량 문서인 경우 세그먼테이션
+
+Phase 4: Code Planning (ParallelLLM)
+├─ ConceptAnalysisAgent  ──┐
+├─ AlgorithmAnalysisAgent ─┼─ 병렬 실행
+└─ CodePlannerAgent      ──┘
+    → YAML Implementation Plan
+
+Phase 5-7: Reference Intelligence (enable_indexing=True)
+├─ paper_reference_analyzer() → GitHub 레포 식별
+├─ github_repo_download() → Repository 클론
+└─ run_codebase_indexing() → 인덱스 생성
+
+Phase 8: Code Implementation
+└─ CodeImplementationWorkflow.run_workflow()
+    → 파일별 코드 생성]]></ac:plain-text-body>
+    </ac:structured-macro>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>Pipeline B: 채팅 요구사항 → 코드 생성</h2>
+
+<ac:structured-macro ac:name="expand">
+  <ac:parameter ac:name="title">execute_chat_based_planning_pipeline() 상세 (클릭하여 펼침)</ac:parameter>
+  <ac:rich-text-body>
+    <ac:structured-macro ac:name="code">
+      <ac:parameter ac:name="language">text</ac:parameter>
+      <ac:plain-text-body><![CDATA[Phase 0: Workspace Setup
+└─ deepcode_lab/papers/{id}/ 디렉토리 생성
+
+Phase 1: Chat-Based Planning
+└─ run_chat_planning_agent()
+    → CHAT_AGENT_PLANNING_PROMPT
+    → YAML Implementation Plan
+
+Phase 2: Workspace Synthesis
+└─ initial_plan.txt 저장
+
+Phase 3: Code Implementation
+└─ CodeImplementationWorkflow.run_workflow()
+    → 파일별 코드 생성]]></ac:plain-text-body>
+    </ac:structured-macro>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>Pipeline C: 요구사항 분석 (인터랙티브)</h2>
+
+<ac:structured-macro ac:name="expand">
+  <ac:parameter ac:name="title">process_requirement_analysis() 상세 (클릭하여 펼침)</ac:parameter>
+  <ac:rich-text-body>
+    <ac:structured-macro ac:name="code">
+      <ac:parameter ac:name="language">text</ac:parameter>
+      <ac:plain-text-body><![CDATA[Step 1: 가이드 질문 생성
+└─ RequirementAnalysisAgent.generate_guiding_questions()
+    → 5-8개의 맞춤형 질문
+
+Step 2: 사용자 답변 수집
+└─ CLI/UI를 통해 각 질문에 답변
+
+Step 3: 요구사항 문서 생성
+└─ RequirementAnalysisAgent.summarize_detailed_requirements()
+    → 상세 요구사항 문서
+
+Step 4: 코드 구현으로 진행
+└─ execute_chat_based_planning_pipeline()]]></ac:plain-text-body>
+    </ac:structured-macro>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr />
+
+<h1>설치 및 실행</h1>
+
+<h2>Direct Installation (권장)</h2>
+
+<ac:structured-macro ac:name="code">
+  <ac:parameter ac:name="language">bash</ac:parameter>
+  <ac:parameter ac:name="title">pip 설치</ac:parameter>
+  <ac:plain-text-body><![CDATA[# DeepCode 패키지 설치
+pip install deepcode-hku
+
+# 설정 파일 다운로드
+curl -O https://raw.githubusercontent.com/HKUDS/DeepCode/main/mcp_agent.config.yaml
+curl -O https://raw.githubusercontent.com/HKUDS/DeepCode/main/mcp_agent.secrets.yaml
+
+# API 키 설정 (mcp_agent.secrets.yaml 수정)
+# - openai: api_key, base_url
+# - anthropic: api_key
+# - google: api_key]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h2>Development Installation (소스)</h2>
+
+<ac:structured-macro ac:name="expand">
+  <ac:parameter ac:name="title">소스 설치 방법 (클릭하여 펼침)</ac:parameter>
+  <ac:rich-text-body>
+    <ac:structured-macro ac:name="code">
+      <ac:parameter ac:name="language">bash</ac:parameter>
+      <ac:parameter ac:name="title">UV 사용 (권장)</ac:parameter>
+      <ac:plain-text-body><![CDATA[# Repository 클론
+git clone https://github.com/HKUDS/DeepCode.git
+cd DeepCode/
+
+# UV 패키지 매니저 설치
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 의존성 설치
+uv venv --python=3.13
+source .venv/bin/activate
+uv pip install -r requirements.txt]]></ac:plain-text-body>
+    </ac:structured-macro>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>실행 방법</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>인터페이스</th>
+      <th>명령어</th>
+      <th>접속</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Web UI (권장)</strong></td>
+      <td><code>deepcode</code> 또는 <code>streamlit run ui/streamlit_app.py</code></td>
+      <td>http://localhost:8501</td>
+    </tr>
+    <tr>
+      <td><strong>CLI</strong></td>
+      <td><code>python cli/main_cli.py</code></td>
+      <td>터미널</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h1>CLI 사용법</h1>
+
+<h2>실행 모드</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>모드</th>
+      <th>명령어</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Interactive</strong></td>
+      <td><code>python cli/main_cli.py</code></td>
+      <td>메뉴 기반 대화형 모드</td>
+    </tr>
+    <tr>
+      <td><strong>File Direct</strong></td>
+      <td><code>python cli/main_cli.py --file paper.pdf</code></td>
+      <td>파일 직접 처리</td>
+    </tr>
+    <tr>
+      <td><strong>URL Direct</strong></td>
+      <td><code>python cli/main_cli.py --url &lt;url&gt;</code></td>
+      <td>URL 직접 처리</td>
+    </tr>
+    <tr>
+      <td><strong>Chat Direct</strong></td>
+      <td><code>python cli/main_cli.py --chat "요구사항"</code></td>
+      <td>자연어 요구사항 직접 처리</td>
+    </tr>
+    <tr>
+      <td><strong>Requirement Analysis</strong></td>
+      <td><code>python cli/main_cli.py --requirement "..."</code></td>
+      <td>가이드 Q&amp;A 기반 요구사항 수집</td>
+    </tr>
+    <tr>
+      <td><strong>호환성 모드</strong></td>
+      <td><code>python cli/main_cli.py --simple</code></td>
+      <td>PTY 호환 (Code Server 등)</td>
+    </tr>
+    <tr>
+      <td><strong>인덱싱 활성화</strong></td>
+      <td><code>python cli/main_cli.py --enable-indexing</code></td>
+      <td>CodeRAG 인덱싱 사용</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>주요 CLI 옵션</h2>
+
+<ac:structured-macro ac:name="code">
+  <ac:parameter ac:name="language">bash</ac:parameter>
+  <ac:plain-text-body><![CDATA[python cli/main_cli.py --help
+
+옵션:
+  --simple, --compat     호환성 모드 (ANSI 코드 비활성화)
+  --enable-indexing      코드 인덱싱 활성화
+  --optimized, -o        최적화 모드 (인덱싱 비활성화)
+  --verbose, -v          상세 로그 출력
+  --file FILE, -f        파일 직접 처리
+  --url URL, -u          URL 직접 처리
+  --chat TEXT, -t        채팅 입력으로 직접 처리
+  --requirement TEXT     요구사항 분석 모드]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<hr />
+
+<h1>Code Indexing (CodeRAG)</h1>
+
+<ac:structured-macro ac:name="info">
+  <ac:rich-text-body>
+    <p>CodeRAG는 참조 코드베이스를 LLM 기반으로 분석하여 Knowledge Graph 인덱스를 생성함. 코드 생성 시 관련 코드 패턴, 함수, 개념을 검색하여 참조 가능.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>인덱싱 프로세스</h2>
+
+<ac:structured-macro ac:name="code">
+  <ac:parameter ac:name="language">text</ac:parameter>
+  <ac:parameter ac:name="title">LLM Indexing Pipeline</ac:parameter>
+  <ac:plain-text-body><![CDATA[Step 1: Directory Filtering (대용량 레포 전용)
+└─ "어떤 디렉토리가 target과 관련있나?" → 관련 디렉토리 max 10개 선별
+
+Step 2: File Pre-filtering
+└─ "어떤 파일이 target 구현에 도움이 될까?" → confidence > 0.3 파일 선별
+
+Step 3: File Analysis (파일별 반복)
+└─ "이 파일의 함수, 개념, 의존성은?" → 구조화된 파일 요약 생성
+
+Step 4: Relationship Analysis (파일별 반복)
+└─ "이 파일이 target의 어떤 파일 구현에 도움이 될까?" → 관계 매핑]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h2>관계 유형</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>유형</th>
+      <th>가중치</th>
+      <th>설명</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>direct_match</code></td>
+      <td>1.0</td>
+      <td>직접적인 구현 매칭 (예: GCN 파일 → target GCN)</td>
+    </tr>
+    <tr>
+      <td><code>partial_match</code></td>
+      <td>0.8</td>
+      <td>부분적 기능 매칭</td>
+    </tr>
+    <tr>
+      <td><code>reference</code></td>
+      <td>0.6</td>
+      <td>참조용 코드</td>
+    </tr>
+    <tr>
+      <td><code>utility</code></td>
+      <td>0.4</td>
+      <td>범용 유틸리티</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>인덱싱 실행</h2>
+
+<ac:structured-macro ac:name="code">
+  <ac:parameter ac:name="language">bash</ac:parameter>
+  <ac:parameter ac:name="title">인덱싱 사용법</ac:parameter>
+  <ac:plain-text-body><![CDATA[# 1. 참조 코드베이스 준비
+cd deepcode_lab/reference_code/
+git clone https://github.com/example/reference-project.git
+
+# 2. 인덱싱 실행
+python tools/run_reference_indexer.py --verbose
+
+# 3. Mock 모드 테스트 (LLM 호출 없이)
+python tools/run_reference_indexer.py --mock --verbose
+
+# 4. 인덱싱 활성화하여 CLI 실행
+python cli/main_cli.py --enable-indexing]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h2>인덱스 파일 구조</h2>
+
+<ac:structured-macro ac:name="expand">
+  <ac:parameter ac:name="title">JSON Index Structure (클릭하여 펼침)</ac:parameter>
+  <ac:rich-text-body>
+    <ac:structured-macro ac:name="code">
+      <ac:parameter ac:name="language">json</ac:parameter>
+      <ac:plain-text-body><![CDATA[{
+  "repo_name": "example-project",
+  "total_files": 42,
+  "file_summaries": [
+    {
+      "file_path": "src/core/main.py",
+      "file_type": "Python module - Core functionality",
+      "main_functions": ["process_data", "run_pipeline"],
+      "key_concepts": ["data processing", "pipeline"],
+      "dependencies": ["numpy", "pandas"],
+      "summary": "Main entry point for data processing pipeline."
+    }
+  ],
+  "relationships": [
+    {
+      "repo_file_path": "src/core/main.py",
+      "target_file_path": "src/pipeline.py",
+      "relationship_type": "direct_match",
+      "confidence_score": 0.85,
+      "helpful_aspects": ["pipeline architecture", "data flow"],
+      "usage_suggestions": "Reference for implementing data pipeline"
+    }
+  ]
+}]]></ac:plain-text-body>
+    </ac:structured-macro>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<ac:structured-macro ac:name="warning">
+  <ac:rich-text-body>
+    <p><strong>대용량 Repository 주의사항</strong></p>
+    <ul>
+      <li>파일 10,000개 초과 시: 관련 폴더만 별도 추출하여 인덱싱 권장</li>
+      <li>파일 2,000~10,000개: 불필요 파일 정리 필수</li>
+      <li>불필요 파일 정리: <code>find deepcode_lab/reference_code -type f ! -name "*.py" -delete</code></li>
+    </ul>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr />
+
+<h1>설정</h1>
+
+<h2>LLM Provider 설정</h2>
+
+<ac:structured-macro ac:name="code">
+  <ac:parameter ac:name="language">yaml</ac:parameter>
+  <ac:parameter ac:name="title">mcp_agent.config.yaml</ac:parameter>
+  <ac:plain-text-body><![CDATA[# LLM 제공자 선택
+llm_provider: "google"  # "anthropic", "openai" 중 선택
+
+# 제공자별 모델 설정
+google:
+  default_model: "gemini-3-pro-preview"
+  planning_model: "gemini-3-pro-preview"
+  implementation_model: "gemini-2.5-flash"
+
+anthropic:
+  default_model: "claude-sonnet-4.5"
+  implementation_model: "claude-sonnet-3.5"
+
+openai:
+  default_model: "o3-mini"
+  implementation_model: "gpt-4o"
+
+# 문서 세그먼테이션 설정
+document_segmentation:
+  enabled: false
+  size_threshold_chars: 50000]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h2>API 키 설정</h2>
+
+<ac:structured-macro ac:name="code">
+  <ac:parameter ac:name="language">yaml</ac:parameter>
+  <ac:parameter ac:name="title">mcp_agent.secrets.yaml</ac:parameter>
+  <ac:plain-text-body><![CDATA[google:
+  api_key: "your-google-api-key"
+
+anthropic:
+  api_key: "your-anthropic-api-key"
+
+openai:
+  api_key: "your-openai-api-key"
+  base_url: "https://api.openai.com/v1"  # 또는 vLLM 엔드포인트]]></ac:plain-text-body>
+</ac:structured-macro>
+
+<h2>환경 변수</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>변수</th>
+      <th>설명</th>
+      <th>기본값</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DEEPCODE_CLI_SIMPLE</code></td>
+      <td>호환성 모드 활성화</td>
+      <td><code>0</code></td>
+    </tr>
+    <tr>
+      <td><code>DEEPCODE_NO_COLOR</code></td>
+      <td>색상 비활성화</td>
+      <td><code>0</code></td>
+    </tr>
+    <tr>
+      <td><code>NO_COLOR</code></td>
+      <td>표준 색상 비활성화</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td><code>DEEPCODE_REFERENCE_PATH</code></td>
+      <td>참조 코드 경로</td>
+      <td><code>deepcode_lab/reference_code</code></td>
+    </tr>
+    <tr>
+      <td><code>DEEPCODE_INDEXES_PATH</code></td>
+      <td>인덱스 출력 경로</td>
+      <td><code>deepcode_lab/indexes</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h1>트러블슈팅</h1>
+
+<h2>입력창 표시 문제</h2>
+
+<ac:structured-macro ac:name="panel">
+  <ac:parameter ac:name="title">증상</ac:parameter>
+  <ac:parameter ac:name="borderStyle">solid</ac:parameter>
+  <ac:rich-text-body>
+    <ul>
+      <li>프롬프트 입력창이 깜빡임</li>
+      <li>키보드 입력이 화면에 표시되지 않음</li>
+      <li>"Tokens | usage 0 tokens | $0.0000" 라인이 입력을 방해</li>
+      <li>메뉴가 깨져서 표시됨</li>
+    </ul>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<ac:structured-macro ac:name="tip">
+  <ac:rich-text-body>
+    <p><strong>해결 방법</strong>: 호환성 모드 사용</p>
+    <ac:structured-macro ac:name="code">
+      <ac:parameter ac:name="language">bash</ac:parameter>
+      <ac:plain-text-body><![CDATA[python cli/main_cli.py --simple]]></ac:plain-text-body>
+    </ac:structured-macro>
+    <p>원인: Code Server, VS Code 웹 터미널 등 PTY 에뮬레이션 제한. <code>--simple</code> 옵션은 ANSI 코드 비활성화 및 mcp_agent console 로거 자동 비활성화.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>인덱싱 비활성화</h2>
+
+<ac:structured-macro ac:name="panel">
+  <ac:parameter ac:name="title">증상</ac:parameter>
+  <ac:parameter ac:name="borderStyle">solid</ac:parameter>
+  <ac:rich-text-body>
+    <ul>
+      <li>Codebase Indexing: Disabled 표시</li>
+      <li>코드 생성 시 참조 코드가 사용되지 않음</li>
+    </ul>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<ac:structured-macro ac:name="tip">
+  <ac:rich-text-body>
+    <p><strong>해결 방법</strong>:</p>
+    <ac:structured-macro ac:name="code">
+      <ac:parameter ac:name="language">bash</ac:parameter>
+      <ac:plain-text-body><![CDATA[# 인덱싱 활성화하여 실행
+python cli/main_cli.py --enable-indexing
+
+# 또는 대화형 메뉴에서
+# [C] Configure -> [T] Toggle Pipeline 선택]]></ac:plain-text-body>
+    </ac:structured-macro>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>대용량 Repository 인덱싱 오류</h2>
+
+<ac:structured-macro ac:name="panel">
+  <ac:parameter ac:name="title">증상</ac:parameter>
+  <ac:parameter ac:name="borderStyle">solid</ac:parameter>
+  <ac:rich-text-body>
+    <p><code>Error code: 400 - max_tokens must be at least 1, got -746049</code></p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<ac:structured-macro ac:name="tip">
+  <ac:rich-text-body>
+    <p><strong>해결 방법</strong>: 불필요한 파일 정리</p>
+    <ac:structured-macro ac:name="code">
+      <ac:parameter ac:name="language">bash</ac:parameter>
+      <ac:plain-text-body><![CDATA[# 코드 파일만 남기고 삭제
+find deepcode_lab/reference_code/your_repo -type f \
+  ! -name "*.py" ! -name "*.md" ! -name "*.txt" \
+  ! -name "*.yaml" ! -name "*.yml" ! -name "*.json" \
+  -delete
+
+# 빈 폴더 정리
+find deepcode_lab/reference_code/your_repo -type d -empty -delete]]></ac:plain-text-body>
+    </ac:structured-macro>
+    <p>원인: 파일이 너무 많은 Repository(20,000+ 파일) 인덱싱 시 토큰 초과.</p>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<h2>터미널 환경별 권장 설정</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>환경</th>
+      <th>권장 명령어</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>VS Code 통합 터미널</td>
+      <td><code>python cli/main_cli.py</code></td>
+    </tr>
+    <tr>
+      <td>VS Code Server (웹)</td>
+      <td><code>python cli/main_cli.py --simple</code></td>
+    </tr>
+    <tr>
+      <td>SSH 세션</td>
+      <td><code>python cli/main_cli.py --simple</code></td>
+    </tr>
+    <tr>
+      <td>Docker 컨테이너</td>
+      <td><code>docker run -it ... python cli/main_cli.py</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h1>참고 자료</h1>
+
+<ul>
+  <li><strong>GitHub Repository</strong>: <a href="https://github.com/HKUDS/DeepCode">https://github.com/HKUDS/DeepCode</a></li>
+  <li><strong>논문 (arXiv)</strong>: <a href="https://arxiv.org/abs/2512.07921">https://arxiv.org/abs/2512.07921</a></li>
+  <li><strong>Discord 커뮤니티</strong>: <a href="https://discord.gg/yF2MmDJyGJ">https://discord.gg/yF2MmDJyGJ</a></li>
+</ul>
+
+<ac:structured-macro ac:name="panel">
+  <ac:parameter ac:name="title">Citation</ac:parameter>
+  <ac:parameter ac:name="borderStyle">solid</ac:parameter>
+  <ac:rich-text-body>
+    <ac:structured-macro ac:name="code">
+      <ac:parameter ac:name="language">text</ac:parameter>
+      <ac:plain-text-body><![CDATA[@misc{li2025deepcodeopenagenticcoding,
+      title={DeepCode: Open Agentic Coding},
+      author={Zongwei Li and Zhonghang Li and Zirui Guo and Xubin Ren and Chao Huang},
+      year={2025},
+      eprint={2512.07921},
+      archivePrefix={arXiv},
+      primaryClass={cs.SE},
+      url={https://arxiv.org/abs/2512.07921},
+}]]></ac:plain-text-body>
+    </ac:structured-macro>
+  </ac:rich-text-body>
+</ac:structured-macro>
+
+<hr />
+
+<p><em>MIT License - Copyright (c) 2025 Data Intelligence Lab, The University of Hong Kong</em></p>
+
+</body>
